@@ -2,7 +2,7 @@ import OpenAI from 'openai';
 
 // ChatGPT와 통신하여 보안 코딩 권장 사항을 가져오는 함수
 export async function getChatGptResponse(code: string): Promise<string> {
-    const apiKey =  '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'; ;  // OpenAI API 키 설정
+    const apiKey =  '' ;  // OpenAI API 키 설정
     const openai = new OpenAI({
         apiKey: apiKey,
         organization: "org-4sapNkDrgWBnogO56cB5QkCQ",
