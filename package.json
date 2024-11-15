@@ -55,9 +55,20 @@
             {
                 "command": "newon.ai",
                 "title": "Detect ai"
+            },
+            {
+                "command": "newon.toggleHighlight",
+                "title": "Highlight On/Off"
             }
         ],
         "menus": {
+            "editor/title": [
+            {
+                "command": "newon.toggleHighlight",
+                "when": "resourceLangId == javascript || resourceLangId == python || resourceLangId == java",
+                "group": "navigation"
+            }
+            ],
             "view/title": [
                 {
                     "command": "newon.fuzz",
