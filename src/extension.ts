@@ -138,29 +138,49 @@ export function activate(context: vscode.ExtensionContext) {
 
     const diagnosticsCollection = vscode.languages.createDiagnosticCollection('securityChecker');
     
+    let isHighlightEnabled = true; // 하이라이트 활성화 상태를 저장하는 플래그
+
     const decorationType = vscode.window.createTextEditorDecorationType({
-        backgroundColor: 'rgba(255, 255, 0, 0.3)', // Yellow highlight with some transparency
+        backgroundColor: 'rgba(255, 255, 0, 0.3)', // Yellow highlight
         border: '1px solid yellow',
         borderRadius: '2px',
     });
-    
+
+    // 하이라이트 토글 기능 추가
+    function toggleHighlight() {
+    isHighlightEnabled = !isHighlightEnabled;
+
+    if (!isHighlightEnabled) {
+        // 모든 에디터의 하이라이트 제거
+        vscode.window.visibleTextEditors.forEach(editor => {
+            clearHighlight(editor);
+        });
+        vscode.window.showInformationMessage('Highlighting Disabled');
+    } else {
+        vscode.window.showInformationMessage('Highlighting Enabled');
+    }
+}
+
     function clearHighlight(editor: vscode.TextEditor) {
         editor.setDecorations(decorationType, []); // 빈 배열로 기존 하이라이트 제거
     }
-    
+
     function highlightSecurityIssues(editor: vscode.TextEditor, issues: any[]) {
-        clearHighlight(editor); // 기존 하이라이트 제거
-    
-        const decorations: vscode.DecorationOptions[] = issues.map(issue => {
-            const start = new vscode.Position(issue.startLine, issue.startCharacter);
-            const end = new vscode.Position(issue.endLine, issue.endCharacter);
-            const range = new vscode.Range(start, end);
-    
-            return { range };
-        });
-    
-        editor.setDecorations(decorationType, decorations);
-    }
+        if (!isHighlightEnabled) {
+            return; // 하이라이트가 비활성화된 경우 아무 작업도 하지 않음
+        }
+
+    const decorations: vscode.DecorationOptions[] = issues.map(issue => {
+        const start = new vscode.Position(issue.startLine, issue.startCharacter);
+        const end = new vscode.Position(issue.endLine, issue.endCharacter);
+        const range = new vscode.Range(start, end);
+
+        return { range };
+    });
+
+    editor.setDecorations(decorationType, decorations);
+}
+
     
 
     function reportSecurityIssues(document: vscode.TextDocument, issues: any[]) {
@@ -327,6 +347,13 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(fuzzCommand);
     context.subscriptions.push(detectAllCommand);
     context.subscriptions.push(aiCommand);
+
+    const toggleHighlightCommand = vscode.commands.registerCommand('newon.toggleHighlight', () => {
+        toggleHighlight();
+    });
+
+    context.subscriptions.push(toggleHighlightCommand);
+
 }
 
 // This method is called when your extension is deactivated
