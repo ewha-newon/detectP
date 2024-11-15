@@ -137,24 +137,31 @@ export function activate(context: vscode.ExtensionContext) {
     });
 
     const diagnosticsCollection = vscode.languages.createDiagnosticCollection('securityChecker');
-
+    
+    const decorationType = vscode.window.createTextEditorDecorationType({
+        backgroundColor: 'rgba(255, 255, 0, 0.3)', // Yellow highlight with some transparency
+        border: '1px solid yellow',
+        borderRadius: '2px',
+    });
+    
+    function clearHighlight(editor: vscode.TextEditor) {
+        editor.setDecorations(decorationType, []); // 빈 배열로 기존 하이라이트 제거
+    }
+    
     function highlightSecurityIssues(editor: vscode.TextEditor, issues: any[]) {
-        const decorationType = vscode.window.createTextEditorDecorationType({
-            backgroundColor: 'rgba(255, 255, 0, 0.3)', // Yellow highlight with some transparency
-            border: '1px solid yellow',
-            borderRadius: '2px',
-        });
-
+        clearHighlight(editor); // 기존 하이라이트 제거
+    
         const decorations: vscode.DecorationOptions[] = issues.map(issue => {
             const start = new vscode.Position(issue.startLine, issue.startCharacter);
             const end = new vscode.Position(issue.endLine, issue.endCharacter);
             const range = new vscode.Range(start, end);
-
+    
             return { range };
         });
-
+    
         editor.setDecorations(decorationType, decorations);
     }
+    
 
     function reportSecurityIssues(document: vscode.TextDocument, issues: any[]) {
         const diagnostics: vscode.Diagnostic[] = [];
